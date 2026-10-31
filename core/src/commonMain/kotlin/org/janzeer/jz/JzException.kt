@@ -11,6 +11,8 @@ class JzException(
     message: String,
     val hint: String? = null,
     cause: Throwable? = null,
+    /** Machine-readable detail for callers that can recover (e.g. the nonce the node expects). */
+    val extra: Any? = null,
 ) : RuntimeException(message, cause)
 
 /** Process exit codes. Documented in README "Exit codes"; scripts rely on them. */

@@ -60,6 +60,8 @@ interface KeyOps {
     fun formatJnz(amount: String): String
     fun isValidAmount(amount: String): Boolean
     fun normalizeAmount(amount: String): String
+    /** Numeric comparison of two decimal strings. */
+    fun compareAmounts(a: String, b: String): Int
     /** Build + sign one transaction. [kind] = transfer | token | registerValidator | exitValidator; [fields] are the builder inputs. */
     fun buildAndSign(kind: String, fields: JsonObject, privateKeyHex: String): SignedTxData
 }

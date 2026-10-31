@@ -98,4 +98,29 @@ actual object Platform {
     actual fun onShutdown(block: () -> Unit) { Runtime.getRuntime().addShutdownHook(Thread { runCatching(block) }) }
     actual fun waitForever() { java.util.concurrent.CountDownLatch(1).await() }
     actual fun sleepMs(ms: Long) { Thread.sleep(ms) }
+    actual fun homeDir(): String = System.getProperty("user.home")
+    actual fun tail(path: String, n: Int): List<String> {
+        val p = Paths.get(path); val size = Files.size(p)
+        val chunk = minOf(size, 2L * 1024 * 1024)
+        java.io.RandomAccessFile(p.toFile(), "r").use { f ->
+            f.seek(size - chunk); val bytes = ByteArray(chunk.toInt()); f.readFully(bytes)
+            val lines = String(bytes, Charsets.UTF_8).split('\n').let { if (chunk < size) it.drop(1) else it }
+            return lines.dropLastWhile { it.isEmpty() }.takeLast(n)
+        }
+    }
+    actual fun size(path: String): Long = try { Files.size(Paths.get(path)) } catch (_: Exception) { -1 }
+    actual fun readFrom(path: String, from: Long): String = java.io.RandomAccessFile(path, "r").use { f -> val len = (f.length() - from).coerceAtLeast(0).toInt(); f.seek(from); val b = ByteArray(len); f.readFully(b); String(b, Charsets.UTF_8) }
+    actual fun glob(pattern: String): List<String> {
+        val p = Paths.get(pattern); var root: Path = p.root ?: Paths.get("")
+        val parts = (0 until p.nameCount).map { p.getName(it).toString() }
+        var dirs = listOf(root)
+        for (part in parts) {
+            dirs = if (part.contains('*')) {
+                val m = java.nio.file.FileSystems.getDefault().getPathMatcher("glob:$part")
+                dirs.flatMap { d -> if (Files.isDirectory(d)) Files.list(d).use { s -> s.filter { m.matches(it.fileName) }.toList() } else emptyList() }
+            } else dirs.map { it.resolve(part) }.filter { Files.exists(it) }
+        }
+        return dirs.map { it.toString() }.sorted()
+    }
+    actual fun modified(path: String): Long = try { Files.getLastModifiedTime(Paths.get(path)).toMillis() } catch (_: Exception) { 0 }
 }

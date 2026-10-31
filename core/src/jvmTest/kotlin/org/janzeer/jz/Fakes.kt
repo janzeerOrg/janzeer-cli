@@ -16,12 +16,21 @@ class FakeChain(override val profile: Profile, private val rpcAnswers: Map<Strin
     var postAnswer: String = "{}"
     var finality: String? = null
     var throwOnRpc: ((String) -> Throwable?)? = null
+    /** Answer computed from method + params; wins over [rpcAnswers] when it returns non-null. */
+    var rpcFn: ((String, JsonElement?) -> String?)? = null
+    /** Called with the post index (0 = first); a non-null result is thrown instead of answering. */
+    var throwOnPost: ((Int) -> Throwable?)? = null
     override fun get(path: String, query: Map<String, Any?>): JsonElement? { calls += "GET $path" to null; return restAnswers[path]?.let(Json::parseToJsonElement) }
-    override fun post(path: String, body: JsonElement): JsonElement? { posted += path to body; return Json.parseToJsonElement(postAnswer) }
+    override fun post(path: String, body: JsonElement): JsonElement? {
+        val n = posted.size; posted += path to body
+        throwOnPost?.invoke(n)?.let { throw it }
+        return Json.parseToJsonElement(postAnswer)
+    }
     override fun getAbsolute(url: String): JsonElement? { calls += "GET $url" to null; return restAnswers[url]?.let(Json::parseToJsonElement) }
     override fun rpc(method: String, params: JsonElement?): JsonElement? {
         calls += method to params
         throwOnRpc?.invoke(method)?.let { throw it }
+        rpcFn?.invoke(method, params)?.let { return Json.parseToJsonElement(it) }
         return rpcAnswers[method]?.let(Json::parseToJsonElement)
     }
     override fun subscribe(kind: String, params: JsonObject, onEvent: (JsonElement) -> Unit, onStatus: (String) -> Unit): AutoCloseable = AutoCloseable { }

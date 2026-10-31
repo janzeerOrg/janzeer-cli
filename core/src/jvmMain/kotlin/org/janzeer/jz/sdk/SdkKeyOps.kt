@@ -57,13 +57,14 @@ class SdkKeyOps : KeyOps {
     override fun formatJnz(amount: String): String = Amounts.formatJnz(java.math.BigDecimal(amount).toPlainString())
     override fun isValidAmount(amount: String): Boolean = Amounts.isValid(amount)
     override fun normalizeAmount(amount: String): String = Amounts.normalize(amount)
+    override fun compareAmounts(a: String, b: String): Int = Amounts.compare(a, b)
 
     /**
      * [fields] keys follow the SDK builder parameters: `from`, `nonce`, `fee`, `networkId`, `timestamp?` plus per kind
      * transfer: `to`, `amount`, `data?` · registerValidator: `validatorKey`, `amount?` · exitValidator: `validatorKey`
      * token: `op` (create|mint|burn|setcap|transfer), `symbol`, `name`, `decimals`, `cap`, `amount`, `tokenId`, `recipient`.
      */
-    override fun buildAndSign(kind: String, fields: JsonObject, privateKeyHex: String): SignedTxData {
+    override fun buildAndSign(kind: String, fields: JsonObject, privateKeyHex: String): SignedTxData = Errors.wrap {
         fun s(k: String): String = fields[k]?.jsonPrimitive?.content ?: throw JzException(ExitCodes.USAGE, "tx", "missing field '$k'")
         fun opt(k: String): String? = fields[k]?.jsonPrimitive?.content
         val from = s("from"); val nonce = s("nonce").toLong(); val fee = s("fee"); val networkId = s("networkId")
@@ -83,6 +84,6 @@ class SdkKeyOps : KeyOps {
             else -> throw JzException(ExitCodes.USAGE, "tx", "unknown transaction kind '$kind'")
         }
         val signed = Account.fromPrivateKey(privateKeyHex.removePrefix("0x")).signTx(unsigned)
-        return SignedTxData(signed.hash, JsonUtil.toElement(signed.toRestBody()) as JsonObject, signed.restPath)
+        SignedTxData(signed.hash, JsonUtil.toElement(signed.toRestBody()) as JsonObject, signed.restPath)
     }
 }

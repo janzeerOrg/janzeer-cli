@@ -41,4 +41,16 @@ expect object Platform {
     fun waitForever()
     /** Sleep. */
     fun sleepMs(ms: Long)
+    /** Home directory. */
+    fun homeDir(): String
+    /** Last [n] lines of a text file (bounded read). */
+    fun tail(path: String, n: Int): List<String>
+    /** File size in bytes, or -1. */
+    fun size(path: String): Long
+    /** Read the bytes appended after [from]. */
+    fun readFrom(path: String, from: Long): String
+    /** Glob matches (`*` in the last path segments only), absolute paths. */
+    fun glob(pattern: String): List<String>
+    /** Last modification time (epoch ms), or 0. */
+    fun modified(path: String): Long
 }

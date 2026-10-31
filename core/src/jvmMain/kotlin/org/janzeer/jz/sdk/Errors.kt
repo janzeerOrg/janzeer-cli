@@ -23,7 +23,7 @@ object Errors {
     fun map(e: Throwable): JzException = when (e) {
         is JzException -> e
         is NonceMismatchException -> JzException(ExitCodes.TX_REJECTED, "nonce-mismatch", e.message ?: "nonce mismatch",
-            if (e.expected != null) "the node expects nonce ${e.expected}; drop --nonce or pass --nonce ${e.expected}" else null, e)
+            if (e.expected != null) "the node expects nonce ${e.expected}; drop --nonce or pass --nonce ${e.expected}" else null, e, e.expected)
         is TxRejectedException -> JzException(ExitCodes.TX_REJECTED, "tx-rejected", "${e.type}: ${e.message}", null, e)
         is ValidationException -> JzException(ExitCodes.TX_REJECTED, "validation", e.message ?: "validation failed", null, e)
         is NotFoundException, is RpcNotFoundException -> JzException(ExitCodes.NOT_FOUND, "not-found", e.message ?: "not found", null, e)
@@ -39,6 +39,7 @@ object Errors {
         is VaultException -> JzException(ExitCodes.WALLET, "vault", e.message ?: "vault error", null, e)
         is JanzeerException -> JzException(ExitCodes.UNEXPECTED, "sdk", e.message ?: e.toString(), null, e)
         is InterruptedException -> JzException(ExitCodes.INTERRUPTED, "interrupted", "interrupted", null, e)
+        is IllegalArgumentException -> JzException(ExitCodes.USAGE, "invalid", e.message ?: "invalid input", null, e)
         else -> JzException(ExitCodes.UNEXPECTED, "unexpected", e.toString(), null, e)
     }
 
