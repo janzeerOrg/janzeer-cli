@@ -1,0 +1,31 @@
+name: ci
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew build :jz-app:fatJar --no-daemon
+      - run: release/smoke-native.sh "java -jar app/build/libs/jz-$(grep -oP '(?<=version = ")[^"]+' build.gradle.kts).jar"
+  native:
+    # Build-readiness gate only: the shipped binaries are built and signed by the maintainer (see release/build-cli.sh).
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '17'
+          distribution: 'graalvm-community'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew :jz-app:nativeCompile --no-daemon -Pjanzeer.nativeXmx=3g
+      - run: release/smoke-native.sh app/build/native/nativeCompile/jz

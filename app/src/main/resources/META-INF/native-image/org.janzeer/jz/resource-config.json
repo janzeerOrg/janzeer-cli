@@ -1,0 +1,7 @@
+{
+  "resources": { "includes": [
+    { "pattern": "\\Qorg/janzeer/sdk/bip39-english.txt\\E" },
+    { "pattern": "\\Qjz-build.properties\\E" },
+    { "pattern": "vectors/.*" }
+  ] }
+}
