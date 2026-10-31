@@ -27,7 +27,9 @@ class WalletCommandsTest {
             assertEquals(0, imp.code, imp.err)
             assertEquals(canonAddress, imp.json.jsonObject["address"]!!.jsonPrimitive.content.lowercase())
             val file = Path.of(imp.json.jsonObject["file"]!!.jsonPrimitive.content)
-            assertTrue(Files.exists(file)); assertEquals("rw-------", java.nio.file.attribute.PosixFilePermissions.toString(Files.getPosixFilePermissions(file)))
+            assertTrue(Files.exists(file))
+            if (!System.getProperty("os.name").lowercase().contains("win")) // Windows has no POSIX permission bits
+                assertEquals("rw-------", java.nio.file.attribute.PosixFilePermissions.toString(Files.getPosixFilePermissions(file)))
             assertFalse(Files.readString(file).contains("abandon"), "secret must not be in clear")
 
             val list = jz(s, "wallet", "list")
