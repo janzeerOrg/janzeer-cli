@@ -66,9 +66,19 @@ interface KeyOps {
     fun buildAndSign(kind: String, fields: JsonObject, privateKeyHex: String): SignedTxData
 }
 
+/** One conformance check: name, pass/fail, detail on failure. */
+data class CheckResult(val name: String, val ok: Boolean, val detail: String? = null)
+
+/** Reproduces the public conformance vectors with the SDK at runtime (`jz vectors check`). */
+interface VectorsCheck {
+    /** [dir] = a directory holding wallet-parity-vectors.json + vault-fixture.json + SHA256SUMS; null = the vendored copies. */
+    fun run(dir: String?): List<CheckResult>
+}
+
 /** Factory for everything that talks to a node or the disk; one per process. */
 interface Services {
     val sdk: SdkInfo
     val keys: KeyOps
+    val vectors: VectorsCheck
     fun chain(profile: Profile, timeoutSec: Int): ChainApi
 }

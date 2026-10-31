@@ -23,6 +23,7 @@ import org.janzeer.jz.cmd.NonceCmd
 import org.janzeer.jz.cmd.SendCmd
 import org.janzeer.jz.cmd.TokenCmd
 import org.janzeer.jz.cmd.ValidatorCmd
+import org.janzeer.jz.cmd.VectorsCmd
 import org.janzeer.jz.cmd.TokensCmd
 import org.janzeer.jz.cmd.TxCmd
 import org.janzeer.jz.cmd.ValidatorsCmd
@@ -127,6 +128,7 @@ class Jz(private val services: Services, private val stdout: (String) -> Unit, p
                 WalletCmd(),
                 SendCmd(), TokenCmd(), ValidatorCmd(),
                 NodeCmd(),
+                VectorsCmd(),
                 KeyCmd(),
                 VersionCmd(),
                 ConfigCmd(),

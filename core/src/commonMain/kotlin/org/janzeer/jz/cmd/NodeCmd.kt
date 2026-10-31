@@ -67,7 +67,7 @@ class NodeCmd : CliktCommand(name = "node") {
                 add("sync" to "${sync.str("syncStatus").orDash()}   tip ${tip.orDash()} / ${target.orDash()}$behind" + (sync.int("stagedBlocks")?.takeIf { it > 0 }?.let { "   staged $it" } ?: ""))
                 add("peers" to (sync.int("peers") ?: hz.int("peers")).orDash())
                 add("health" to (health.str("status") ?: "unreachable") + (health["components"]["db"].str("status")?.let { "   db $it" } ?: "") + (health["components"]["diskSpace"]["details"].long("free")?.let { "   disk free ${it / 1_000_000_000} GB" } ?: ""))
-                up?.let { u -> (u.long("uptimeMs") ?: u.long("uptimeSeconds")?.times(1000) ?: u.long("uptime"))?.let { add("uptime" to humanDuration(it / 1000)) } ?: add("uptime" to Render.generic(u).joinToString("  ") { "${it.first} ${it.second}" }) }
+                (up.long() ?: up.long("uptimeMs"))?.let { add("uptime" to humanDuration(it / 1000)) }
                 add("node key" to info.str("nodeKey").orDash())
             })
             if (health.str("status") != null && health.str("status") != "UP") throw JzException(ExitCodes.NODE_BUSY, "health", "health is ${health.str("status")}")
@@ -96,7 +96,7 @@ class NodeCmd : CliktCommand(name = "node") {
             ctx.out.data(buildJsonObject { put("version", info.str("version")); put("apiVersion", info.str("apiVersion")); put("protocolVersion", info.str("protocolVersion")); put("update", upd ?: JsonNull) })
             ctx.out.kv(buildList {
                 add("node" to info.str("version").orDash()); add("API" to info.str("apiVersion").orDash()); add("protocol" to info.str("protocolVersion").orDash())
-                if (upd != null) { add("latest release" to upd.str("latestVersion").orDash() + (upd.str("checkedAt")?.let { "   (checked $it)" } ?: "")); add("update" to when (upd.bool("updateAvailable")) { true -> "AVAILABLE — jz node update"; false -> "none"; null -> "check disabled" }) }
+                if (upd != null) { add("latest release" to upd.str("latestVersion").orDash() + (upd.long("checkedAt")?.let { "   (checked ${Render.time(it)})" } ?: "")); add("update" to when (upd.bool("updateAvailable")) { true -> "AVAILABLE — jz node update"; false -> "none"; null -> "check disabled" }) }
             })
             if (upd.bool("updateAvailable") == true) throw JzException(ExitCodes.UPDATE_AVAILABLE, "update", "update available: ${upd.str("latestVersion")}", upd.str("url"))
         }
@@ -135,7 +135,7 @@ class NodeCmd : CliktCommand(name = "node") {
                 add("bundle dir" to (dir ?: "not found — pass --node-dir or set node_dir in the profile"))
                 installed?.let { add("installed" to "${it["version"].orDash()}  (${it["os"].orDash()}-${it["arch"].orDash()}, ${it["network"].orDash()})") }
                 add("running" to live.str("version").orDash())
-                upd?.let { add("latest" to it.str("latestVersion").orDash() + (it.str("checkedAt")?.let { c -> "   (node checked $c)" } ?: "")) }
+                upd?.let { add("latest" to it.str("latestVersion").orDash() + (it.long("checkedAt")?.let { c -> "   (node checked ${Render.time(c)})" } ?: "")) }
             })
             if (dir == null) {
                 if (run || rollback) throw JzException(ExitCodes.USAGE, "update", "cannot run update.sh without the bundle directory", "pass --node-dir /path/to/janzeer-node-… or set node_dir in jz.toml")
@@ -148,13 +148,13 @@ class NodeCmd : CliktCommand(name = "node") {
                 if (upd.bool("updateAvailable") == true) throw JzException(ExitCodes.UPDATE_AVAILABLE, "update", "update available: ${upd.str("latestVersion")}", upd.str("url"))
                 return
             }
-            val script = Platform.joinPath(dir, "update.sh")
+            val script = "./update.sh"
             if (rollback) {
                 Prompts.typed(ctx, "rollback", "Restore the previous node version in $dir (restarts the service)")
                 val rc = Platform.run(listOf("bash", script, "--rollback"), dir); if (rc != 0) throw JzException(ExitCodes.UNEXPECTED, "update", "update.sh --rollback exited $rc"); ctx.out.success("rolled back"); return
             }
             if (!run) {
-                ctx.out.line(ctx.out.dim("running: bash update.sh --check")); ctx.out.line()
+                ctx.out.line(ctx.out.dim("running: bash update.sh --check  (in $dir)")); ctx.out.line()
                 when (val rc = Platform.run(listOf("bash", script, "--check"), dir)) {
                     0 -> ctx.out.success("up to date")
                     10 -> throw JzException(ExitCodes.UPDATE_AVAILABLE, "update", "update available", "jz node update --run installs it (downloads, verifies the signature, restarts the service)")
@@ -199,8 +199,9 @@ class NodeCmd : CliktCommand(name = "node") {
             val name = when (level) { "warn" -> "AppWarn.log"; "error" -> "AppError.log"; else -> "AppInfo.log" }
             val candidates = buildList {
                 bundleDir(ctx, nodeDir)?.let { d -> addAll(Platform.glob(Platform.joinPath(d, "logs", "*.log"))); addAll(Platform.glob(Platform.joinPath(d, "*.log"))) }
-                addAll(Platform.glob(Platform.joinPath(Platform.homeDir(), "logs", "*", name)))
-                addAll(Platform.glob(Platform.joinPath(Platform.homeDir(), "logs", "*.log")))
+                addAll(Platform.glob(Platform.joinPath(Platform.homeDir(), "logs", "*janzeer*", name)))
+                addAll(Platform.glob(Platform.joinPath(Platform.homeDir(), "logs", "node*", name)))
+                addAll(Platform.glob(Platform.joinPath(Platform.homeDir(), "logs", "janzeer*.log")))
                 addAll(Platform.glob(Platform.joinPath("run", "logs", "*.log")))
             }
             return candidates.maxByOrNull { Platform.modified(it) }

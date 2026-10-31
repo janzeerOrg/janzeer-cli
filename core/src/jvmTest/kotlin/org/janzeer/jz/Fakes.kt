@@ -42,6 +42,7 @@ class FakeServices(val chainFactory: (Profile) -> FakeChain) : Services {
     private val real = SdkServices()
     override val sdk = real.sdk
     override val keys = SdkKeyOps()
+    override val vectors = real.vectors
     var lastChain: FakeChain? = null
     override fun chain(profile: Profile, timeoutSec: Int): ChainApi = chainFactory(profile).also { lastChain = it }
 }

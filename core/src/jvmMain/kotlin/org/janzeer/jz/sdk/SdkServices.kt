@@ -23,6 +23,7 @@ class SdkServices : Services {
     }
 
     override val keys: KeyOps = SdkKeyOps()
+    override val vectors: org.janzeer.jz.api.VectorsCheck = SdkVectors()
 
     override fun chain(profile: Profile, timeoutSec: Int): ChainApi = SdkChainApi(profile, timeoutSec)
 }
