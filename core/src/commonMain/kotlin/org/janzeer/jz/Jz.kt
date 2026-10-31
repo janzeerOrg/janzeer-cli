@@ -79,8 +79,9 @@ class Jz(private val services: Services, private val stdout: (String) -> Unit, p
 
     override fun helpEpilog(context: Context): String = "Docs: ${BuildInfo.HOMEPAGE}/docs   Source: ${BuildInfo.REPO}"
 
-    private val node by option("--node", metavar = "URL|PROFILE", envvar = "JZ_NODE", help = "Node base URL (REST at /api/v1) or a profile name")
-    private val profile by option("--profile", metavar = "NAME", envvar = "JZ_PROFILE", help = "Profile from jz.toml (mainnet, testnet, local, …)")
+    // JZ_NODE / JZ_PROFILE are read by Profiles.resolve itself (so `config show` can say where the choice came from).
+    private val node by option("--node", metavar = "URL|PROFILE", help = "Node base URL (REST at /api/v1) or a profile name; env JZ_NODE")
+    private val profile by option("--profile", metavar = "NAME", help = "Profile from jz.toml (mainnet, testnet, local, …); env JZ_PROFILE")
     private val json by option("--json", help = "Print the raw JSON instead of tables").flag()
     private val quiet by option("-q", "--quiet", help = "No informational output; errors still go to stderr").flag()
     private val noColor by option("--no-color", envvar = "NO_COLOR", help = "Disable colours").flag()

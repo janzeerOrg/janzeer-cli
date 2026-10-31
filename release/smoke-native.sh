@@ -31,7 +31,7 @@ step "exit codes";       set +e; $JZ --bogus >/dev/null 2>&1; [[ $? == 2 ]] || f
 has() { $JZ --help | grep -qE "^  $1 "; }
 if has vectors; then step "vectors check"; $JZ vectors check >/dev/null || fail "vectors"; fi
 if [[ "${ONLINE:-0}" == 1 ]]; then
-  step "info over https ($NODE)"; $JZ info --node "$NODE" | grep -q "SYNCHRONIZED\|tip" || fail "info"
+  step "info over https ($NODE)"; $JZ info --node "$NODE" --timeout 40 | grep -q "SYNCHRONIZED\|tip" || fail "info"
   if has watch; then
     step "watch blocks for 20 s (WebSocket)"
     set +e; timeout 20 $JZ watch blocks --node "$NODE" > "$TMP/watch.out" 2>&1; set -e
