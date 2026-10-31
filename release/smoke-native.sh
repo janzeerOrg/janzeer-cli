@@ -6,6 +6,7 @@
 set -euo pipefail
 JZ=${1:-app/build/native/nativeCompile/jz}
 NODE=${NODE:-https://explorer.janzeer.org}
+[[ -x "$JZ" || "$JZ" == java* ]] || { [[ -x "$JZ.exe" ]] && JZ="$JZ.exe"; }
 if [[ ! -x "$JZ" && "$JZ" != java* ]]; then echo "no executable at $JZ" >&2; exit 1; fi
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 export JZ_CONFIG_DIR="$TMP/cfg" JZ_PASSWORD_FILE="$TMP/pw" NO_COLOR=1

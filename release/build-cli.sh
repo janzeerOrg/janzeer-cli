@@ -16,7 +16,8 @@ VER=$(sed -n 's/^    version = "\(.*\)"/\1/p' build.gradle.kts | head -1)
 case "$(uname -s)" in Linux) OS=linux ;; Darwin) OS=macos ;; MINGW*|MSYS*|CYGWIN*) OS=windows ;; *) OS=$(uname -s | tr 'A-Z' 'a-z') ;; esac
 case "$(uname -m)" in x86_64|amd64) ARCH=x64 ;; aarch64|arm64) ARCH=arm64 ;; *) ARCH=$(uname -m) ;; esac
 if [ "$NATIVE" = 1 ]; then
-  [ -x "$GRAAL17/bin/native-image" ] || { echo "GraalVM 17 with native-image not found at $GRAAL17 (set GRAAL17=…)"; exit 1; }
+  # Linux/macOS ship bin/native-image, Windows ships bin/native-image.cmd (Git Bash: run from the "x64 Native Tools" prompt so cl.exe is on PATH)
+  ls "$GRAAL17"/bin/native-image* >/dev/null 2>&1 || { echo "GraalVM 17 with native-image not found at $GRAAL17 (set GRAAL17=…)"; exit 1; }
   export JAVA_HOME="$GRAAL17" GRAALVM_HOME="$GRAAL17" PATH="$GRAAL17/bin:$PATH"
 fi
 echo "jz $VER — $OS-$ARCH$([ "$NATIVE" = 1 ] && echo " (native image, -Xmx$XMX)" || echo " (jar only)")"
@@ -49,9 +50,10 @@ TXT
   ( cd "$STAGE" && sha256sum jz* LICENSE.txt VERSION README.txt > SHA256SUMS )
   # leak guard: nothing that looks like a wallet or a key may ship
   if grep -rlE 'janzeer-wallet|mnemonic|PRIVATE KEY|"ct":' "$STAGE" --exclude=jz --exclude=jz.exe >/dev/null; then echo "!! secret-looking content in $STAGE"; grep -rlE 'janzeer-wallet|mnemonic|PRIVATE KEY|"ct":' "$STAGE" --exclude=jz --exclude=jz.exe; exit 1; fi
-  if [ "$OS" = windows ]; then ( cd "$REL" && rm -f "${NAME:?}.zip" && zip -qr "$NAME.zip" "$NAME" ); ART="$NAME.zip"
+  if [ "$OS" = windows ]; then
+    ( cd "$REL" && rm -f "${NAME:?}.zip" && { command -v zip >/dev/null && zip -qr "$NAME.zip" "$NAME" || powershell -NoProfile -Command "Compress-Archive -Path '$NAME' -DestinationPath '$NAME.zip'"; } ); ART="$NAME.zip"
   else ( cd "$REL" && tar --owner=0 --group=0 -czf "$NAME.tar.gz" "$NAME" ); ART="$NAME.tar.gz"; fi
-  release/smoke-native.sh "$STAGE/jz"
+  release/smoke-native.sh "$STAGE/$(basename "$BIN")"
 fi
 # SHA256SUMS: replace this host's lines, keep the others (merged across platforms before signing)
 ( cd "$REL" && { [ -f SHA256SUMS ] && grep -vE "  (jz-$VER-$OS-$ARCH\.(tar\.gz|zip)|jz-$VER\.jar)\$" SHA256SUMS || true; } > SHA256SUMS.tmp \
