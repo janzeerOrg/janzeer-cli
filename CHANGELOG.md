@@ -5,7 +5,7 @@ All notable changes to `jz` are documented here ([Keep a Changelog](https://keep
 ## 0.1.0 — 2026-10-31
 
 First release, built on `org.janzeer:janzeer-sdk-core|client` 0.1.3 (node 0.1.10, API 1.1.0, protocol 3.4.0). GraalVM native
-image for linux-x64, linux-arm64, windows-x64, macos; runnable jar for any JVM 17+.
+image for linux-x64, linux-arm64 and windows-x64; runnable jar for any JVM 17+ (macOS runs the jar for now).
 
 - Chain reads: `info`, `block`, `tx` (`--wait`), `address` (`--txs`, `--tokens`), `balance`, `nonce`, `validators`, `tokens`; tables or `--json`.
 - Live feeds over the node's WebSocket: `watch blocks`, `watch address`; NDJSON with `--json`.
