@@ -39,7 +39,7 @@ sha256sum -c SHA256SUMS --ignore-missing
 | macOS | `jz-<v>.jar` | no native build yet — use the jar, or build one with `release/build-cli.sh` on a Mac |
 | Any JVM 17+ | `jz-<v>.jar` | `java -jar jz-<v>.jar …` |
 
-The node bundle (`janzeer-node-<v>-…`) ships the same `jz` next to the `janzeer` binary, so a validator operator already has it.
+Node bundles after 0.1.10 (`janzeer-node-<v>-…`) ship the same `jz` next to the `janzeer` binary, so a validator operator gets it with the node.
 
 ## Sixty seconds
 
