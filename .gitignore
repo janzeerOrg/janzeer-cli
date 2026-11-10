@@ -5,3 +5,6 @@ build/
 .idea/
 local.properties
 .env
+
+__pycache__/
+*.pyc
