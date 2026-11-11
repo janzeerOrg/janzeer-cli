@@ -58,7 +58,7 @@ class KeyCmd : CliktCommand(name = "key") {
             val priv = if (privateKeyStdin) (readlnOrNull()?.trim() ?: throw JzException(ExitCodes.USAGE, "usage", "no private key on stdin"))
             else {
                 val w = ctx.wallets.load(wallet ?: ctx.settings.defaultWallet)
-                ctx.wallets.open(w, Prompts.password(ctx, "Password for wallet '${w.name}'")).second.privateKeyHex
+                Prompts.unlock(ctx, w).second.privateKeyHex
             }
             val sig = ctx.keys.signHash(h, priv)
             ctx.out.scalar(sig)

@@ -116,9 +116,7 @@ class WalletCmd : CliktCommand(name = "wallet") {
             val w = ctx.wallets.load(name ?: ctx.settings.defaultWallet)
             var derived: String? = null
             if (verify) {
-                val pp = if (w.isMnemonic && Platform.stdinIsTty() && ctx.passwordFile == null) "" else ""
-                derived = ctx.wallets.open(w, Prompts.password(ctx, "Password for wallet '${w.name}'"), pp).second.checksumAddress
-                if (derived != w.address) ctx.out.warn("stored address ${w.address} differs from the derived $derived (passphrase wallet?)")
+                derived = Prompts.unlock(ctx, w).second.checksumAddress   // asks the BIP39 passphrase when the wallet has one; fails on a mismatch
             }
             ctx.out.data(buildJsonObject { put("name", w.name); put("address", w.address); put("kind", w.kind); put("createdAt", w.createdAt); put("file", w.path); if (derived != null) put("derivedAddress", derived) })
             ctx.out.kv(buildList { add("name" to w.name); add("address" to w.address); add("kind" to w.kind); add("created" to w.createdAt); add("file" to w.path); if (derived != null) add("derived" to derived) })
@@ -137,7 +135,7 @@ class WalletCmd : CliktCommand(name = "wallet") {
         override fun run() {
             val w = ctx.wallets.load(name ?: ctx.settings.defaultWallet)
             if (reveal) {
-                val (secret, key) = ctx.wallets.open(w, Prompts.password(ctx, "Password for wallet '${w.name}'"))
+                val (secret, key) = Prompts.unlock(ctx, w)
                 Prompts.typed(ctx, "reveal", "This prints the SECRET of wallet '${w.name}' (${w.kind})")
                 ctx.out.data(buildJsonObject { put("name", w.name); put("kind", w.kind); put("address", key.checksumAddress); put("secret", secret) })
                 ctx.out.kv(listOf("address" to key.checksumAddress, w.kind to secret))
@@ -161,9 +159,9 @@ class WalletCmd : CliktCommand(name = "wallet") {
         private val name by argument("NAME")
         override fun run() {
             val w = ctx.wallets.load(name)
-            Prompts.typed(ctx, w.name, "Deleting wallet '${w.name}' (${w.address}) — not reversible")
-            ctx.wallets.remove(w.name)
-            ctx.out.data(buildJsonObject { put("removed", w.name) })
+            Prompts.typed(ctx, name, "Deleting wallet '$name' (${w.address}, file ${w.path}) — not reversible")
+            ctx.wallets.remove(w)
+            ctx.out.data(buildJsonObject { put("removed", name); put("file", w.path) })
             ctx.out.success("removed ${w.path}")
         }
     }

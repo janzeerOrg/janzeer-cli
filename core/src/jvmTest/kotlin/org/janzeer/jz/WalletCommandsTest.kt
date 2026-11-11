@@ -60,6 +60,33 @@ class WalletCommandsTest {
 
             assertEquals(0, jz(s, "wallet", "remove", "fresh2", "--yes").code)
             assertFalse(jz(s, "wallet", "list").out.contains("fresh2"))
+
+            // a wallet file renamed by hand: `remove` deletes the file that was NAMED, never the one whose inner name matches
+            val walletsDir = file.parent
+            Files.move(walletsDir.resolve("canon.json"), walletsDir.resolve("old.json"))
+            assertEquals(0, jz(s, *env(dir), "wallet", "import", "--name", "canon", "--mnemonic", canon).code)
+            assertEquals(0, jz(s, "wallet", "remove", "old", "--yes").code)
+            assertFalse(Files.exists(walletsDir.resolve("old.json")))
+            assertTrue(Files.exists(walletsDir.resolve("canon.json")), "the wallet that was not named must survive")
+
+            // a BIP39-passphrase wallet: the stored address is the passphrase-derived one, so opening it must ask for the
+            // passphrase and refuse a wrong one — it used to sign silently from the passphrase-less account
+            val ppAddress = s.keys.fromMnemonic(canon, "correct horse").checksumAddress
+            val canonFile = walletsDir.resolve("canon.json")
+            Files.writeString(canonFile, Files.readString(canonFile).replace(Regex("\"address\"\\s*:\\s*\"[^\"]+\""), "\"address\": \"$ppAddress\""))
+            val ppFile = dir.resolve("pp")
+            try {
+                System.setProperty("jz.env.JZ_PASSPHRASE_FILE", ppFile.toString())
+                Files.writeString(ppFile, "correct horse\n")
+                val ok = jz(s, *env(dir), "wallet", "show", "canon", "--verify", "--json")
+                assertEquals(0, ok.code, ok.err)
+                assertEquals(ppAddress, ok.json.jsonObject["derivedAddress"]!!.jsonPrimitive.content)
+                Files.writeString(ppFile, "wrong\n")
+                assertEquals(ExitCodes.WALLET, jz(s, *env(dir), "wallet", "show", "canon", "--verify").code)
+                assertEquals(ExitCodes.WALLET, jz(s, *env(dir), "wallet", "export", "canon", "--reveal", "--yes").code)
+            } finally {
+                System.clearProperty("jz.env.JZ_PASSPHRASE_FILE")
+            }
         }
     }
 

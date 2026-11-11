@@ -10,7 +10,8 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 actual object Platform {
-    actual fun env(name: String): String? = System.getenv(name)
+    // `-Djz.env.NAME=value` stands in for an environment variable (tests; the JVM cannot set its own environment)
+    actual fun env(name: String): String? = System.getenv(name) ?: System.getProperty("jz.env.$name")
     actual fun isWindows(): Boolean = System.getProperty("os.name").lowercase().contains("win")
 
     actual fun configDir(): String {

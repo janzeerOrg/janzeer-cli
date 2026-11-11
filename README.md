@@ -90,7 +90,7 @@ Global options may be written anywhere: `jz info --json` and `jz --json info` ar
 
 ### How a write works
 
-`wallet` is opened (password prompt, or `--password-file` / `JZ_PASSWORD_FILE`) → the node's network id is read and checked
+`wallet` is opened (password prompt, or `--password-file` / `JZ_PASSWORD_FILE`; a wallet created with `--passphrase` also asks for the BIP39 passphrase, or reads `JZ_PASSPHRASE_FILE`, and refuses one that does not give the wallet's address) → the node's network id is read and checked
 against the profile → nonce from the node (or `--nonce`) → fee from `janzeer_estimateFee` (a fixed fee cannot be changed; a
 minimum may be raised with `--fee`) → the SDK builds and signs → a summary is shown → `Send this transaction? [y/N]` (skip
 with `--yes`) → `POST /api/v1/transactions/…` → with `--wait`, the node's `janzeer_waitForFinality` long-poll until the block

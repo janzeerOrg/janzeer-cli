@@ -7,5 +7,5 @@ plugins {
 allprojects {
     group = "org.janzeer"
     // Keep in step with BuildInfo.VERSION (core) — `./gradlew check` fails on a mismatch (see :jz-core:checkVersion).
-    version = "0.1.0"
+    version = "0.1.1"
 }

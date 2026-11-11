@@ -57,7 +57,9 @@ class WalletStore(private val dir: String, private val keys: KeyOps) {
         return secret to key
     }
 
-    fun remove(name: String) { Platform.delete(path(name)) }
+    /** Deletes the file the wallet was LOADED from. The name stored inside a wallet file is not the file's name once the
+     *  file was renamed by hand; deleting by that inner name removed a different wallet (review 2026-11-11). */
+    fun remove(file: WalletFile) { Platform.delete(file.path) }
 
     fun render(w: WalletFile): String = json.encodeToString(JsonObject.serializer(), buildJsonObject {
         put("format", WalletFile.FORMAT); put("v", WalletFile.VERSION); put("name", w.name); put("kind", w.kind)

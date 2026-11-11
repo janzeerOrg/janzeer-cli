@@ -49,7 +49,7 @@ object TxFlow {
         }
 
         // The secret is needed from here on.
-        val (_, key) = ctx.wallets.open(w, Prompts.password(ctx, "Password for wallet '${w.name}'"))
+        val (_, key) = Prompts.unlock(ctx, w)
         var nonce = o.nonce ?: nextNonce(ctx, key.address)
 
         fun build(n: Long) = ctx.keys.buildAndSign(req.kind, buildJsonObject {
