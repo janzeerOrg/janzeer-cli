@@ -1,12 +1,10 @@
 @echo off
-rem Windows twin of build-cli.sh: run in the "x64 Native Tools Command Prompt" with GraalVM 17 (set GRAAL17 to its folder).
+rem Windows twin of build-cli.sh: run in the "x64 Native Tools Command Prompt" with JAVA_HOME pointing at GraalVM 17.
 rem Produces build\release\jz-<ver>-windows-x64.zip, jz-<ver>.jar and their SHA256SUMS lines.
 setlocal
 cd /d %~dp0..
-if "%GRAAL17%"=="" set GRAAL17=%USERPROFILE%\graalvm-17
-set JAVA_HOME=%GRAAL17%
-set GRAALVM_HOME=%GRAAL17%
-set PATH=%GRAAL17%\bin;%PATH%
+if "%JAVA_HOME%"=="" (echo JAVA_HOME is not set - point it at GraalVM 17 with native-image& exit /b 1)
+if "%GRAALVM_HOME%"=="" set GRAALVM_HOME=%JAVA_HOME%
 rem /c: makes findstr take the pattern as ONE string (without it every space-separated word is its own search and VER came out as "in").
 for /f "tokens=2 delims== " %%v in ('findstr /r /c:"^    version = " build.gradle.kts') do set VER=%%~v
 set VER=%VER:"=%
