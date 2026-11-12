@@ -52,9 +52,9 @@ TXT
   if grep -rlE 'janzeer-wallet|mnemonic|PRIVATE KEY|"ct":' "$STAGE" --exclude=jz --exclude=jz.exe >/dev/null; then echo "!! secret-looking content in $STAGE"; grep -rlE 'janzeer-wallet|mnemonic|PRIVATE KEY|"ct":' "$STAGE" --exclude=jz --exclude=jz.exe; exit 1; fi
   if [ "$OS" = windows ]; then
     # zip entries MUST use forward slashes (PowerShell 5.1 Compress-Archive writes backslashes, which other unzips take literally):
-    # Info-ZIP zip, else Windows' own bsdtar (System32\tar.exe, Windows 10 1803+), else .NET ZipFile (forward slashes since .NET 4.6.1).
+    # real Info-ZIP zip, else Windows' own bsdtar (System32\tar.exe, Windows 10 1803+), else .NET ZipFile (forward slashes since .NET 4.6.1).
     ( cd "$REL" && rm -f "${NAME:?}.zip"
-      if command -v zip >/dev/null; then zip -qr "$NAME.zip" "$NAME"
+      if zip -v 2>/dev/null | grep -q "Info-ZIP"; then zip -qr "$NAME.zip" "$NAME"   # a 7-Zip "zip" on PATH refuses -qr
       elif [ -x /c/Windows/System32/tar.exe ]; then /c/Windows/System32/tar.exe -a -cf "$NAME.zip" "$NAME"
       else powershell -NoProfile -Command "Add-Type -AssemblyName System.IO.Compression.FileSystem; [IO.Compression.ZipFile]::CreateFromDirectory((Resolve-Path '$NAME'), (Join-Path (Get-Location) '$NAME.zip'), 'Optimal', \$true)"; fi
       if unzip -l "$NAME.zip" 2>/dev/null | grep -q '\\'; then echo "!! $NAME.zip has backslash entry names"; exit 1; fi ); ART="$NAME.zip"
