@@ -2,7 +2,7 @@
 # Arch Linux package of the jz release binary (https://github.com/janzeerOrg/janzeer-cli).
 # Rendered by release/build-arch-package.sh from the Linux x64 bundle of the same version — do not edit by hand.
 pkgname=janzeer-cli-bin
-pkgver=0.1.0
+pkgver=0.1.1
 pkgrel=1
 pkgdesc="jz — command-line client for the Janzeer blockchain: chain reads, live watch, local encrypted wallet, transactions, node operations"
 arch=('x86_64')
@@ -14,7 +14,7 @@ conflicts=('jz')
 options=('!strip' '!debug')
 _bundle="jz-${pkgver}-linux-x64"
 source=("https://github.com/janzeerOrg/janzeer-cli/releases/download/v${pkgver}/${_bundle}.tar.gz")
-sha256sums=('47694113b858bfda77732968c8b060a06a00759454c55e0052365fcbd01aa7e5')
+sha256sums=('90800c2fc5058fed34abdddfacb7d2894747da3ffe1fb2eeb28383190f7cb1ac')
 
 package() {
   install -Dm755 "$srcdir/$_bundle/jz" "$pkgdir/usr/bin/jz"

@@ -1,6 +1,6 @@
 pkgbase = janzeer-cli-bin
 	pkgdesc = jz — command-line client for the Janzeer blockchain: chain reads, live watch, local encrypted wallet, transactions, node operations
-	pkgver = 0.1.0
+	pkgver = 0.1.1
 	pkgrel = 1
 	url = https://github.com/janzeerOrg/janzeer-cli
 	arch = x86_64
@@ -11,7 +11,7 @@ pkgbase = janzeer-cli-bin
 	conflicts = jz
 	options = !strip
 	options = !debug
-	source = https://github.com/janzeerOrg/janzeer-cli/releases/download/v0.1.0/jz-0.1.0-linux-x64.tar.gz
-	sha256sums = 47694113b858bfda77732968c8b060a06a00759454c55e0052365fcbd01aa7e5
+	source = https://github.com/janzeerOrg/janzeer-cli/releases/download/v0.1.1/jz-0.1.1-linux-x64.tar.gz
+	sha256sums = 90800c2fc5058fed34abdddfacb7d2894747da3ffe1fb2eeb28383190f7cb1ac
 
 pkgname = janzeer-cli-bin
