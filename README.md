@@ -36,7 +36,7 @@ sha256sum -c SHA256SUMS --ignore-missing
 | Linux x86-64 | `jz-<v>-linux-x64.tar.gz` | glibc 2.34+ (Debian 12, Ubuntu 22.04 or newer); also `janzeer-cli-bin` for Arch (`packaging/arch/`) |
 | Linux arm64 | `jz-<v>-linux-arm64.tar.gz` | Raspberry Pi 3/4/5 and other aarch64 boards |
 | Windows x64 | `jz-<v>-windows-x64.zip` | `jz.exe`; config under `%APPDATA%\janzeer`; also via Scoop: `scoop install ./packaging/scoop/jz.json` |
-| macOS | `jz-<v>.jar` | no native build yet — use the jar, or build one with `release/build-cli.sh` on a Mac |
+| macOS | `jz-<v>.jar` | no native build yet — use the jar, build one with `release/build-cli.sh` on a Mac; also via Homebrew: `brew install --build-from-source ./packaging/homebrew/jz.rb` |
 | Any JVM 17+ | `jz-<v>.jar` | `java -jar jz-<v>.jar …` |
 
 Node bundles after 0.1.10 (`janzeer-node-<v>-…`) ship the same `jz` next to the `janzeer` binary, so a validator operator gets it with the node.
