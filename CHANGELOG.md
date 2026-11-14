@@ -4,6 +4,7 @@ All notable changes to `jz` are documented here ([Keep a Changelog](https://keep
 
 ## Packaging — 2026-11-14 (no new release)
 
+- **Homebrew formula for macOS** (`packaging/homebrew/jz.rb`, contributed by @genda-benjamin): installs the signed 0.1.1 runnable jar with OpenJDK 17+, wraps it with `bin.write_jar_script`, and checks its SHA-256 against `SHA256SUMS`.
 - **Scoop manifest for Windows** (`packaging/scoop/jz.json`, contributed by @genda-benjamin): installs the signed 0.1.1 zip, checks its SHA-256, and updates itself from the release's `SHA256SUMS`.
 
 ## 0.1.1 — 2026-11-11
