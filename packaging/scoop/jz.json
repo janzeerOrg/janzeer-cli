@@ -1,18 +1,17 @@
 {
-    "version": "0.1.1",
-    "description": "jz — the Janzeer command-line client",
+    "version": "0.1.0",
+    "description": "The Janzeer command-line client",
     "homepage": "https://janzeer.org",
     "license": "Apache-2.0",
-    "url": "https://github.com/janzeerOrg/janzeer-cli/releases/download/v0.1.1/jz-0.1.1-windows-x64.zip",
-    "hash": "39c271fa86dfbce2bd6aa14b42d7931688689ee2cbdabd0ba2377e65760121e4",
-    "extract_dir": "jz-0.1.1-windows-x64",
+    "url": "https://github.com/janzeerOrg/janzeer-cli/releases/download/v0.1.0/jz-0.1.0-windows-x64.zip",
+    "hash": "8940842270928227653597826388482736452718293048572615243546576879",
+    "extract_dir": "jz-0.1.0-windows-x64",
     "bin": "jz.exe",
     "checkver": "github",
     "autoupdate": {
         "url": "https://github.com/janzeerOrg/janzeer-cli/releases/download/v$version/jz-$version-windows-x64.zip",
-        "extract_dir": "jz-$version-windows-x64",
         "hash": {
-            "url": "https://github.com/janzeerOrg/janzeer-cli/releases/download/v$version/SHA256SUMS"
+            "url": "$baseurl/SHA256SUMS"
         }
     }
 }
