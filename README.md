@@ -38,7 +38,8 @@ sha256sum -c SHA256SUMS --ignore-missing
 | Windows x64 | `jz-<v>-windows-x64.zip` | `jz.exe`; config under `%APPDATA%\janzeer`; also via Scoop: `scoop install ./packaging/scoop/jz.json` |
 | macOS | `jz-<v>.jar` | no native build yet — use the jar, build one with `release/build-cli.sh` on a Mac; also via Homebrew: `brew install --build-from-source ./packaging/homebrew/jz.rb` |
 | Any JVM 17+ | `jz-<v>.jar` | `java -jar jz-<v>.jar …` |
-
+ | Nix (Linux / macOS) | flake | `nix run github:janzeerOrg/janzeer-cli -- info`; native image on Linux, jar on macOS (`flake.nix`, `packaging/nix/) |
+ 
 Node bundles after 0.1.10 (`janzeer-node-<v>-…`) ship the same `jz` next to the `janzeer` binary, so a validator operator gets it with the node.
 
 ## Sixty seconds

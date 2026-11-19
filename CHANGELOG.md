@@ -4,6 +4,10 @@ All notable changes to `jz` are documented here ([Keep a Changelog](https://keep
 
 ## Packaging — 2026-11-18 (no new release)
 
+- **Nix flake** (`flake.nix`, `packaging/nix/package.nix`): `nix run github:janzeerOrg/janzeer-cli -- info`, or `nix build` to install `jz` — wraps the published Linux native image on x86_64/arm64 (hashes from the release's `SHA256SUMS`, patched with `autoPatchelfHook`, shell completions included) and, on macOS, the runnable jar with JDK 17+, the same approach as the Homebrew formula.
+
+## Packaging — 2026-11-18 (no new release)
+
 - **Debian/Ubuntu package** (`release/build-deb-package.sh`): wraps the published Linux bundle into `janzeer-cli_<version>-1_<arch>.deb` (amd64 and arm64) with `dpkg-deb`, the same files as the Arch package, no maintainer scripts; a local bundle is used as-is, or `--download` fetches the release asset and checks it against the release's `SHA256SUMS`.
 
 ## Packaging — 2026-11-14 (no new release)
