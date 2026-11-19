@@ -2,6 +2,10 @@
 
 All notable changes to `jz` are documented here ([Keep a Changelog](https://keepachangelog.com/en/1.1.0/), [SemVer](https://semver.org/)).
 
+## Packaging — 2026-11-18 (no new release)
+
+- **Debian/Ubuntu package** (`release/build-deb-package.sh`): wraps the published Linux bundle into `janzeer-cli_<version>-1_<arch>.deb` (amd64 and arm64) with `dpkg-deb`, the same files as the Arch package, no maintainer scripts; a local bundle is used as-is, or `--download` fetches the release asset and checks it against the release's `SHA256SUMS`.
+
 ## Packaging — 2026-11-14 (no new release)
 
 - **Homebrew formula for macOS** (`packaging/homebrew/jz.rb`, contributed by @genda-benjamin): installs the signed 0.1.1 runnable jar with OpenJDK 17+, wraps it with `bin.write_jar_script`, and checks its SHA-256 against `SHA256SUMS`.
